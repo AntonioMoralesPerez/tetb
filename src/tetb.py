@@ -232,7 +232,7 @@ def phys(
         SG (int): number of the Space Group
 
     Returns:
-        int: `0` if it is physical, otherwise in any other case.
+        Bool: `True` if it is physical, `False` otherwise.
     """
 
     if SG in fixedGamma2:
