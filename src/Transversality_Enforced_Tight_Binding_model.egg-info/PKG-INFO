@@ -1,3 +1,16 @@
+Metadata-Version: 2.1
+Name: Transversality-Enforced-Tight-Binding-model
+Version: 1.0
+Summary: Python package for obtaining transversality-enforced tight-bindings model in photonic crystals
+Author: Antonio Morales-Pérez, Chiara Devescovi, Yoonseok Hwang, Mikel García-Díez, Barry Bradlyn, Juan L. Mañes, Maia G. Vergniory, and Aitzol García-Etxarri
+Author-email: antonio.morales@dipc.org
+Keywords: tight binding,topological quantum chemistry,topological photonics,topological materials
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: sympy
+Requires-Dist: ortools
+
 # Transversality-Enforced Tight-Binding (TETB) model
 
 **Implemented by Antonio Morales-Pérez, Chiara Devescovi, Yoonseok Hwang, Mikel García-Díez, Barry Bradlyn, Juan L. Mañes, Maia G. Vergniory, and Aitzol García-Etxarri**
