@@ -7,9 +7,9 @@ Author-email: antonio.morales@dipc.org
 Keywords: tight binding,topological quantum chemistry,topological photonics,topological materials
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: numpy
-Requires-Dist: sympy
-Requires-Dist: ortools
+Requires-Dist: numpy==2.0.0
+Requires-Dist: sympy==1.12
+Requires-Dist: ortools==9.10.4067
 
 # Transversality-Enforced Tight-Binding (TETB) model
 
@@ -31,9 +31,9 @@ pip install .
 
 It requieres two additional packages:
 
-1. [NumPy](https://github.com/numpy/numpy.git)
-2. [SymPy](https://github.com/sympy/sympy.git)
-3. [OR-Tools - Google Optimization Tools](https://github.com/google/or-tools.git)
+1. [NumPy](https://github.com/numpy/numpy.git) (v2.0.0)
+2. [SymPy](https://github.com/sympy/sympy.git) (v1.12)
+3. [OR-Tools - Google Optimization Tools](https://github.com/google/or-tools.git) (v9.10.4067)
 
 ## Examples
 
