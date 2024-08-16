@@ -107,7 +107,6 @@ class varArraySolutionObtainer(cp_model.CpSolverSolutionCallback):
         self.__solutionCount += 1
         self.__x.append([self.value(v) for v in self.__variables])  # type:ignore
 
-    @property
     def solutionCount(self) -> int:
         """Returns the total number of solutions.
 
@@ -116,7 +115,6 @@ class varArraySolutionObtainer(cp_model.CpSolverSolutionCallback):
         """
         return self.__solutionCount
 
-    @property
     def solutions(self) -> np.ndarray:
         """Returns all solutions of the model in a matrix form, where each row is a particular solution.
 
@@ -147,13 +145,14 @@ def searchForAllLongModes(dim: list[int], t: int) -> varArraySolutionObtainer:
     N = len(dim)
 
     # Creates the variables
-    x = [model.NewIntVar(0, 1000, f"x{i}") for i in range(N)]
+    x = [model.new_int_var(0, 1000, f"x{i}") for i in range(N)]
     solutionObtainer = varArraySolutionObtainer(x)  # type:ignore
 
     # Create the constraints.
     model.add(np.dot(x, dim) == t)  # type:ignore
 
     # Solve.
+    solver.parameters.enumerate_all_solutions = True
     solver.SearchForAllSolutions(model, solutionObtainer)
 
     return solutionObtainer
@@ -203,8 +202,12 @@ def searchForAll_EBRs(
         x = [model.NewIntVar(0, 1000, f"x{i}") for i in range(N_ebrs)]
         solutionObtainer = varArraySolutionObtainer(x)  # type:ignore
 
+        n = EBR @ i
+        y = v + n
+        z = y.astype(int)
+
         for j in range(N_irr):
-            model.Add(EBR[j] @ (x - i) == v[j])
+            model.Add(EBR[j] @ x == z[j])
 
         solver.SearchForAllSolutions(model, solutionObtainer)
 
