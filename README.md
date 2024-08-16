@@ -2,7 +2,9 @@
 
 **Implemented by Antonio Morales-Pérez, Chiara Devescovi, Yoonseok Hwang, Mikel García-Díez, Barry Bradlyn, Juan L. Mañes, Maia G. Vergniory, and Aitzol García-Etxarri**
 
-In this package we implement the essential functions necessary to implemente the enumeration algorithm presented in Ref. [1].
+In this package we implement the essential functions necessary to implement the *enumeration algorithm*, which returns all possible decomposition in terms of elementary bands representations of a "symmetry vector" of a bundle of isolated photonic bands.
+
+The analytical framework underlying our implementation of the TETB model is detailed in Ref. [1].
 
 ## Installation
 
@@ -25,8 +27,7 @@ It requieres two additional packages:
 We provide a set of Jupyter notebooks in `./examples/` for the following cases:
 
 1. The specific examples studied in Ref. [1] under space groups (SGs) #224 and #221
-2. All first minimal solutions of SG #99 presented in Ref. [2]
-3. All first minimal solutions of SG #2 presented in Ref. [2]
+2. All first minimal solutions of SG #224, #221, #99 and #2 presented in Ref. [2]
 
 ## References
 
