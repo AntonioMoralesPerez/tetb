@@ -91,7 +91,7 @@ class varArraySolutionObtainer(cp_model.CpSolverSolutionCallback):
         cp_model (list): list of variables defined in your model.
     """
 
-    def __init__(self, variables: cp_model.IntVar) -> None:
+    def __init__(self, variables: list[cp_model.IntVar]) -> None:
         """Initiate a solution initial state.
 
         Args:
@@ -105,8 +105,9 @@ class varArraySolutionObtainer(cp_model.CpSolverSolutionCallback):
     def on_solution_callback(self) -> None:
         """Save the current solution in a list and add `1` to the solution count."""
         self.__solutionCount += 1
-        self.__x.append([self.Value(v) for v in self.__variables])  # type:ignore
+        self.__x.append([self.value(v) for v in self.__variables])  # type:ignore
 
+    @property
     def solutionCount(self) -> int:
         """Returns the total number of solutions.
 
@@ -115,6 +116,7 @@ class varArraySolutionObtainer(cp_model.CpSolverSolutionCallback):
         """
         return self.__solutionCount
 
+    @property
     def solutions(self) -> np.ndarray:
         """Returns all solutions of the model in a matrix form, where each row is a particular solution.
 
@@ -149,7 +151,7 @@ def searchForAllLongModes(dim: list[int], t: int) -> varArraySolutionObtainer:
     solutionObtainer = varArraySolutionObtainer(x)  # type:ignore
 
     # Create the constraints.
-    model.Add(np.dot(x, dim) == t)  # type:ignore
+    model.add(np.dot(x, dim) == t)  # type:ignore
 
     # Solve.
     solver.SearchForAllSolutions(model, solutionObtainer)
@@ -169,7 +171,7 @@ def vec2ebr(v: np.ndarray, ebrs: list[sp.core.add.Add]) -> list[sp.core.add.Add]
         list: list whose elements are the sum of EBRs related to each row of the matrix `v`.
     """
     y = v @ ebrs
-    return y.tolist()
+    return y
 
 
 def searchForAll_EBRs(
