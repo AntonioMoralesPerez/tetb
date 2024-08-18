@@ -8,7 +8,7 @@ The analytical framework underlying our implementation of the TETB model is deta
 
 ## Installation
 
-Install by navigating to the working directory and run
+Remember to clone the repository before installing by navigating to the working directory and running
 
 ````
 pip install .
@@ -16,7 +16,7 @@ pip install .
 
 ## Requirements
 
-It requieres two additional packages:
+It requieres three additional packages:
 
 1. [NumPy](https://github.com/numpy/numpy.git) (v2.0.0)
 2. [SymPy](https://github.com/sympy/sympy.git) (v1.12)

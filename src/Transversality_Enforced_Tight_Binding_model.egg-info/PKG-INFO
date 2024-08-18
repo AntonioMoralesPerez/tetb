@@ -15,13 +15,13 @@ Requires-Dist: ortools==9.10.4067
 
 **Implemented by Antonio Morales-Pérez, Chiara Devescovi, Yoonseok Hwang, Mikel García-Díez, Barry Bradlyn, Juan L. Mañes, Maia G. Vergniory, and Aitzol García-Etxarri**
 
-In this package we implement the essential functions necessary to implement the *enumeration algorithm*, which returns all possible decomposition in terms of elementary bands representations of a "symmetry vector" of a bundle of isolated photonic bands.
+In this package we define the essential functions necessary to implement the *enumeration algorithm*, which returns all possible decompositions in terms of elementary bands representations of a "symmetry vector" of a bundle of isolated photonic bands, given a certain number of auxiliary bands.
 
 The analytical framework underlying our implementation of the TETB model is detailed in Ref. [1].
 
 ## Installation
 
-Install by navigating to the working directory and run
+Clone the repository and install by navigating to the working directory and run
 
 ````
 pip install .
