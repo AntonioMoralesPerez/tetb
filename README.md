@@ -2,13 +2,13 @@
 
 **Implemented by Antonio Morales-Pérez, Chiara Devescovi, Yoonseok Hwang, Mikel García-Díez, Barry Bradlyn, Juan L. Mañes, Maia G. Vergniory, and Aitzol García-Etxarri**
 
-In this package we define the essential functions necessary to implement the *enumeration algorithm*, which returns all possible decompositions in terms of elementary bands representations of a "symmetry vector" of a bundle of isolated photonic bands, given a certain number of auxiliary bands.
+In this package we define the essential functions necessary to implement the *enumeration algorithm*, which returns all possible decompositions in terms of elementary bands representations (EBRs) of a "symmetry vector" of a bundle of isolated photonic bands, given a certain number of auxiliary bands.
 
-The analytical framework underlying our implementation of the TETB model is detailed in Ref. [1].
+The analytical framework underlying our implementation of the TETB model is detailed in Ref. [1]. We will use the notation for labelling the space groups (SGs), irreducible representations (irreps) and EBRs presented in Ref. [3].
 
 ## Installation
 
-Remember to clone the repository before installing by navigating to the working directory and running
+Clone the repository and install the package by navigating to the working directory and running
 
 ````
 pip install .
@@ -29,6 +29,8 @@ We provide a set of Jupyter notebooks in `./examples/` for the following cases:
 1. The specific examples studied in Ref. [1] under space groups (SGs) #224 and #221
 2. All first minimal solutions of SG #224, #221, #99 and #2 presented in Ref. [2]
 
+As a first step, it is necessary to define by hand all the EBRs and irreps of the specific SG of the system under study. To accomplish this we forward the user to the tables shown in Ref. [3]. There, one can find all EBRs and all irreps tabulated for all magnetic and non-magnetic SGs. More details are given within the examples.
+
 ## References
 
 Please cite the following paper when using this package:
@@ -36,6 +38,10 @@ Please cite the following paper when using this package:
 [1] A. Morales-Pérez, C. Devescovi, Y. Hwang, et al., “Transversality-enforced tight-binding model for 3d photonic crystals aided by topological quantum chemistry,” arXiv preprint arXiv:2305.18257 (2023).
 
 [2] T. Christensen, H. C. Po, J. D. Joannopoulos, and M. Soljačić, “Location and topology of the fundamental gap in photonic crystals,” Phys. Rev. X 12, 021066 (2022).
+
+[3] B. Bradlyn, L. Elcoro, J. Cano, M. G. Vergniory, Z. Wang, C. Felser, M. I. Aroyo & B. A. Bernevig
+"Topological quantum chemistry"
+Nature 547, 298-305 (2017). TODO: change it for a link to the BCS?
 
 ## Acknowledgments
 

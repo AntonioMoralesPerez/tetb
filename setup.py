@@ -9,7 +9,7 @@ setuptools.setup(
     author="Antonio Morales-Pérez, Chiara Devescovi, Yoonseok Hwang, Mikel García-Díez, Barry Bradlyn, Juan L. Mañes, Maia G. Vergniory, and Aitzol García-Etxarri",  # Full name of the author
     author_email="antonio.morales@dipc.org",  # Email of the author at the time of first release
     keywords="tight binding, topological quantum chemistry, topological photonics, topological materials",
-    description="Python package for obtaining transversality-enforced tight-bindings model in photonic crystals",
+    description="Python package for obtaining Transversality-Enforced Tight-Binding models in photonic crystals",
     long_description=long_description,  # Long description read from the the readme file
     long_description_content_type="text/markdown",
     py_modules=[
