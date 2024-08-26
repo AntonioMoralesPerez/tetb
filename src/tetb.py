@@ -150,6 +150,10 @@ def search_for_all_long_modes(dim: list[int], t: int) -> varArraySolutionObtaine
         and total number of solutions.
     """
 
+    _check_ebr_dimensions(dim)
+    if t <= 0:
+        raise ValueError("Maximum dimension `t` must be postive.")
+
     # Initiate a model and solver.
     model = cp_model.CpModel()
     solver = cp_model.CpSolver()
@@ -204,6 +208,8 @@ def search_for_all_ebrs(
         list[np.ndarray]: vectors of multiplicities of EBRs which solve the problem
         for a certain set of auxiliary modes defined by the input `long_modes`.
     """
+    _check_ebr_dimensions(dim)
+
     possible_ebrs = []  # empty list that will contain all solutions
 
     N_ebrs = len(dim)
@@ -270,7 +276,7 @@ def ebr_sum_is_physical(
             ).coeff(irreps[1])
             > 0
         )
-    elif SG in FIXED_GAMMA_4:
+    elif sg in FIXED_GAMMA_4:
         phys = (
             ebr2ir(x, ebr_names=ebr_names, ebr_irreps=ebr_irreps, irreps=irreps).coeff(
                 irreps[0]
@@ -331,6 +337,10 @@ def show_all_results(
         if the EBRs decompositions are physical (`True`) or not (`False`) and
         fourth component is the surrogated representation at $¢$\Gamma$ and zero frequency.
     """
+    _check_ebr_dimensions(dim)
+    if t <= 0:
+        raise ValueError("Maximum dimension `t` must be positive.")
+
     # remove Gamma from the study so the algorithm is Gamma agnostic
     rv = np.delete(v, range(N_gamma))  # type: ignore
     rEBR = np.delete(ebr_irreps, range(N_gamma), axis=0)  # type: ignore
@@ -414,6 +424,10 @@ def show_only_physical(
         the auxiliary modes used $n^L$, and, third component the surrogated
         representation at $\Gamma$ and zero frequency.
     """
+    _check_ebr_dimensions(dim)
+    if t <= 0:
+        raise ValueError("Maximum dimension `t` must be positive.")
+
     rv = np.delete(v, range(N_gamma))  # type: ignore
     rEBR = np.delete(ebr_irreps, range(N_gamma), axis=0)  # type: ignore
 
@@ -458,3 +472,12 @@ def show_only_physical(
         for j in range(len(TETB_vs_LM[i][0]))
         if physical[i][j] == True
     ]
+
+
+def _check_ebr_dimensions(dim):
+    dim = np.array(dim)
+
+    if not issubclass(dim.dtype.type, np.integer):
+        raise ValueError("EBR dimensions must be integer")
+    elif (dim <= 0).any():
+        raise ValueError("EBR dimensions must be positive")
