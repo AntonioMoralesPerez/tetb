@@ -53,44 +53,44 @@ def ebr2vec(v: sp.core.add.Add, ebrs: list[sp.core.symbol.Symbol]) -> np.ndarray
 
 
 def ebr2irvec(
-    v: sp.core.add.Add, ebrs: list[sp.core.symbol.Symbol], EBR: np.ndarray
+    v: sp.core.add.Add, ebr_names: list[sp.core.symbol.Symbol], ebr_irreps: np.ndarray
 ) -> np.ndarray:
     """Convert a sum of EBRs into a vector of multiplicities of the irreps of
     the space group following the order in the input `EBR`.
 
     Args:
         v (sympy.core.add.Add): sum of EBRs of the space group.
-        ebrs (list): ordered names of the EBRs of the space group.
-        EBRs (numpy.ndarray): matrix form by columns with the vectors of
+        ebr_names (list): ordered names of the EBRs of the space group.
+        ebr_irreps (numpy.ndarray): matrix form by columns with the vectors of
             multiplicities of the irreps for each EBR.
 
     Returns:
         numpy.ndarray: vector of multiplicities of the irreps following the
-        order specified in the input `EBR`.
+        order specified in the input `ebr_irreps`.
     """  # noqa: E501
-    vec = EBR @ np.array([v.coeff(ebr) for ebr in ebrs])
+    vec = ebr_irreps @ np.array([v.coeff(ebr) for ebr in ebr_names])
     return vec
 
 
 def ebr2ir(
     v: sp.core.add.Add,
     irreps: list[sp.core.symbol.Symbol],
-    ebrs: list[sp.core.symbol.Symbol],
-    EBR: np.ndarray,
+    ebr_names: list[sp.core.symbol.Symbol],
+    ebr_irreps: np.ndarray,
 ) -> sp.core.add.Add:
     """Convert a sum of EBRs into a sum of irreps of the space group.
 
     Args:
         v (sympy.core.add.Add): sum of EBRs of the space group.
         irreps (list): ordered names of the irreps of the space group.
-        ebrs (list): list of EBRs indicating their order and names.
-        EBR (numpy.ndarray): matrix form by columns with the vectors of
+        ebr_names (list): list of EBRs indicating their order and names.
+        ebr_irreps (numpy.ndarray): matrix form by columns with the vectors of
             multiplicities of the irreps for each EBR.
 
     Returns:
         sympy.core.add.Add: sum of irreps of the space group.
     """  # noqa: E501
-    ir = irreps @ ebr2irvec(v, ebrs, EBR)
+    ir = irreps @ ebr2irvec(v, ebr_names, ebr_irreps)
     return ir
 
 
@@ -136,7 +136,7 @@ class varArraySolutionObtainer(cp_model.CpSolverSolutionCallback):
         return np.array(self.__x)
 
 
-def searchForAllLongModes(dim: list[int], t: int) -> varArraySolutionObtainer:
+def search_for_all_long_modes(dim: list[int], t: int) -> varArraySolutionObtainer:
     """Construct and solve a model which searches for all possible set of bands
     with total dimension `t`. The output of this function can be used as a
     set of auxiliary modes of dimension `t` to input in the *enumeration algorithm*.
@@ -170,23 +170,23 @@ def searchForAllLongModes(dim: list[int], t: int) -> varArraySolutionObtainer:
     return solutionObtainer
 
 
-def vec2ebr(v: np.ndarray, ebrs: list[sp.core.add.Add]) -> list[sp.core.add.Add]:
+def vec2ebr(v: np.ndarray, ebr_names: list[sp.core.add.Add]) -> list[sp.core.add.Add]:
     """Transform a vector of multiplicities of EBRs into a sum of EBRs.
 
     Args:
         v (numpy.ndarray): vector of EBR multiplicites or matrix where each row
             is a vector of multiplicities, in the same order as the input `ebrs`.
-        ebrs (list): ordered list of all posible EBRs of the space group.
+        ebr_names (list): ordered list of all posible EBRs of the space group.
 
     Returns:
         list:  sums of EBRs related to the input vector or to each row of the input matrix.
     """
-    y = v @ ebrs
+    y = v @ ebr_names
     return y
 
 
-def searchForAll_EBRs(
-    v: np.ndarray, dim: list[int], EBR: np.ndarray, long_modes
+def search_for_all_ebrs(
+    v: np.ndarray, dim: list[int], ebr_irreps: np.ndarray, long_modes
 ) -> list[np.ndarray]:
     """Define and solver a model which search for all posible linear combinations
     of EBRs which, after subtracting a set of auxiliary modes until dimension `t`,
@@ -195,7 +195,7 @@ def searchForAll_EBRs(
     Args:
         v (numpy.ndarray): vector of multiplicities of the irreps.
         dim (list): dimensions of the EBRs of the space group.
-        EBR (numpy.ndarray): matrix form by columns with the vectors of
+        ebr_irreps (numpy.ndarray): matrix form by columns with the vectors of
             multiplicities of the irreps for each EBR in the space group.
         long_modes (np.ndarray):  vector of multiplicities of EBRs to use as
             auxiliary modes for the model.
@@ -204,7 +204,7 @@ def searchForAll_EBRs(
         list[np.ndarray]: vectors of multiplicities of EBRs which solve the problem
         for a certain set of auxiliary modes defined by the input `long_modes`.
     """
-    possibleEBRs = []  # empty list that will contain all solutions
+    possible_ebrs = []  # empty list that will contain all solutions
 
     N_ebrs = len(dim)
     N_irr = len(v)
@@ -217,27 +217,27 @@ def searchForAll_EBRs(
         solutionObtainer = varArraySolutionObtainer(x)  # type:ignore
 
         # introduce the constrains for each model using the particular auxiliary modes
-        n = EBR @ i
+        n = ebr_irreps @ i
         y = v + n
         z = y.astype(int)
         for j in range(N_irr):
-            model.Add(EBR[j] @ x == z[j])
+            model.Add(ebr_irreps[j] @ x == z[j])
 
         # solve
         solver.SearchForAllSolutions(model, solutionObtainer)
 
         # append the solutions found for each model with the particular auxiliary modes used
-        possibleEBRs.append(solutionObtainer.solutions())
+        possible_ebrs.append(solutionObtainer.solutions())
 
-    return possibleEBRs
+    return possible_ebrs
 
 
-def phys(
+def ebr_sum_is_physical(
     x: sp.core.add.Add,
     v: np.ndarray,
-    ebrs: list[sp.core.symbol.Symbol],
-    EBR: np.ndarray,
-    SG: int,
+    ebr_names: list[sp.core.symbol.Symbol],
+    ebr_irreps: np.ndarray,
+    sg: int,
     irreps: list[sp.core.symbol.Symbol],
 ) -> int:
     """Determines if a linear combinations of EBRs given by the input `x` are
@@ -248,10 +248,10 @@ def phys(
         x (sp.core.add.Add): linear combinations of EBRs of the space group.
         v (numpy.ndarray): vector of multiplicities of the irreps following
             the order specified in the input `irreps`.
-        ebrs (list): ordered variables defining the EBRs of the space group.
-        EBR (numpy.ndarray): matrix form by columns with the vectors of
+        ebr_names (list): ordered variables defining the EBRs of the space group.
+        ebr_irreps (numpy.ndarray): matrix form by columns with the vectors of
             multiplicities of the irreps for each EBR.
-        SG (int): number of the space group given by the notation used in the
+        sg (int): number of the space group given by the notation used in the
             Bilbao Crystallographic Server.
 
     Returns:
@@ -259,19 +259,35 @@ def phys(
     """
 
     # differentiate between pinned and unpinned PGs and between different trivial irreps in such PGs
-    if SG in FIXED_GAMMA_2:
+    if sg in FIXED_GAMMA_2:
         phys = (
-            ebr2ir(x, ebrs=ebrs, EBR=EBR, irreps=irreps).coeff(irreps[0]) > 0
-            or ebr2ir(x, ebrs=ebrs, EBR=EBR, irreps=irreps).coeff(irreps[1]) > 0
+            ebr2ir(x, ebr_names=ebr_names, ebr_irreps=ebr_irreps, irreps=irreps).coeff(
+                irreps[0]
+            )
+            > 0
+            or ebr2ir(
+                x, ebr_names=ebr_names, ebr_irreps=ebr_irreps, irreps=irreps
+            ).coeff(irreps[1])
+            > 0
         )
     elif SG in FIXED_GAMMA_4:
         phys = (
-            ebr2ir(x, ebrs=ebrs, EBR=EBR, irreps=irreps).coeff(irreps[0]) > 0
-            or ebr2ir(x, ebrs=ebrs, EBR=EBR, irreps=irreps).coeff(irreps[3]) > 0
+            ebr2ir(x, ebr_names=ebr_names, ebr_irreps=ebr_irreps, irreps=irreps).coeff(
+                irreps[0]
+            )
+            > 0
+            or ebr2ir(
+                x, ebr_names=ebr_names, ebr_irreps=ebr_irreps, irreps=irreps
+            ).coeff(irreps[3])
+            > 0
         )
     else:
         phys = (
-            np.sum(ebr2irvec(x, ebrs, EBR) - v - np.abs(ebr2irvec(x, ebrs, EBR) - v))
+            np.sum(
+                ebr2irvec(x, ebr_names, ebr_irreps)
+                - v
+                - np.abs(ebr2irvec(x, ebr_names, ebr_irreps) - v)
+            )
             / 2
             == 0
         )  # checks if all negative multiplicities are contained in the auxiliary modes
@@ -279,15 +295,15 @@ def phys(
     return phys
 
 
-def showAllResults(
+def show_all_results(
     v: np.ndarray,
     t: int,
     dim: list[int],
-    EBRs: np.ndarray,
+    ebr_irreps: np.ndarray,
     N_gamma: int,
-    ebrs: list[sp.core.symbol.Symbol],
+    ebr_names: list[sp.core.symbol.Symbol],
     irreps: list[sp.core.symbol.Symbol],
-    SG: int,
+    sg: int,
 ) -> list[
     tuple[list[sp.core.add.Add], sp.core.add.Add, list[int], list[sp.core.add.Add]]
 ]:
@@ -301,12 +317,12 @@ def showAllResults(
             ordered as input `irreps`.
         t (int): dimension of the auxiliary modes to search for. Must be positive.
         dim (list): dimensions of the EBRs of the space group ordered as input `ebrs`.
-        EBRs (numpy.ndarray): matrix form by columns with the vectors of
+        ebr_names (numpy.ndarray): matrix form by columns with the vectors of
             multiplicities of the irreps for each EBR.
         N_gamma (int): number of irreps at $\Gamma$.
-        ebrs (list): ordered variables defining the EBRs of the space group.
+        ebr_irreps (list): ordered variables defining the EBRs of the space group.
         irreps (list): ordered names of the irreps of the space group.
-        SG (int): number of the space group
+        sg (int): number of the space group
 
     Returns:
         list: list of tuples whose first component is a list of possible lineal
@@ -317,17 +333,17 @@ def showAllResults(
     """
     # remove Gamma from the study so the algorithm is Gamma agnostic
     rv = np.delete(v, range(N_gamma))  # type: ignore
-    rEBR = np.delete(EBRs, range(N_gamma), axis=0)  # type: ignore
+    rEBR = np.delete(ebr_irreps, range(N_gamma), axis=0)  # type: ignore
 
     # compute all possible auxiliary modes with dimension t
-    long_modes = searchForAllLongModes(dim, t).solutions()
+    long_modes = search_for_all_long_modes(dim, t).solutions()
 
     # use such auxiliary modes to search for all possible EBR decompositions of the symmetry vector v
-    all_EBRs = searchForAll_EBRs(rv, dim, rEBR, long_modes)
+    all_EBRs = search_for_all_ebrs(rv, dim, rEBR, long_modes)
 
     # store the solutions found previously in a fancy way so you can trace back n^{T+L} to each n^L used to compute it
     TETB_vs_LM = [
-        [(all_EBRs[i] @ ebrs).tolist(), (long_modes[i] @ ebrs)]
+        [(all_EBRs[i] @ ebr_names).tolist(), (long_modes[i] @ ebr_names)]
         for i in range(len(long_modes))
         if all_EBRs[i].shape[0] > 0
     ]
@@ -335,7 +351,9 @@ def showAllResults(
     # check if the decomposition obtained is physical or not
     physical = [
         [
-            phys(TETB_vs_LM[i][0][j], v, ebrs, EBRs, SG, irreps)
+            ebr_sum_is_physical(
+                TETB_vs_LM[i][0][j], v, ebr_names, ebr_irreps, sg, irreps
+            )
             for j in range(len(TETB_vs_LM[i][0]))
         ]
         for i in range(len(TETB_vs_LM))
@@ -347,8 +365,8 @@ def showAllResults(
             (
                 irreps
                 @ (
-                    ebr2irvec(TETB_vs_LM[i][0][j], ebrs, EBRs)
-                    - ebr2irvec(TETB_vs_LM[i][1], ebrs, EBRs)
+                    ebr2irvec(TETB_vs_LM[i][0][j], ebr_names, ebr_irreps)
+                    - ebr2irvec(TETB_vs_LM[i][1], ebr_names, ebr_irreps)
                     - v
                 )
             )
@@ -363,32 +381,32 @@ def showAllResults(
     ]
 
 
-def showOnlyPhysical(
+def show_only_physical(
     v: np.ndarray,
     t: int,
     dim: list[int],
-    EBRs: np.ndarray,
+    ebr_irreps: np.ndarray,
     N_gamma: int,
-    ebrs: list[sp.core.symbol.Symbol],
+    ebr_names: list[sp.core.symbol.Symbol],
     irreps: list[sp.core.symbol.Symbol],
-    SG: int,
+    sg: int,
 ) -> list[tuple[list[sp.core.add.Add], sp.core.add.Add, list[sp.core.add.Add]]]:
     """Obtains all *physical* linear combinations of EBRs $n^{T+L}$ which can
     be represented by the *symmetry vector* `v`. In addition, it computes any
     necessary auxiliary modes $n^L$ to obtain such decompositions in EBRs, and,
     the surrogated representation at the $\Gamma$ point and zero frequency.
-    Same functionally as `showAllResults` but filtering only the *physical* solutions.
+    Same functionally as `show_all_results` but filtering only the *physical* solutions.
 
     Args:
         v (numpy.ndarray): multiplicities of the irreps following ordered as input `irreps`.
         t (int): maximum dimension of the auxiliary modes to search. Must be positive.
         dim (list):  dimensions of the EBRs of the space ordered as input `ebrs`.
-        EBRs (numpy.ndarray): matrix form by columns with the vectors of
+        ebr_irreps (numpy.ndarray): matrix form by columns with the vectors of
             multiplicities of the irreps for each EBR.
         N_gamma (int): number of irreps at Gamma.
-        ebrs (list): ordered variables defining the posible EBRs of the space group.
+        ebr_names (list): ordered variables defining the posible EBRs of the space group.
         irreps (list): orderd names of the irreps of the space group.
-        SG (int): number of the space group.
+        sg (int): number of the space group.
 
     Returns:
         list: list of tuples which first component indicate the physical linear
@@ -397,21 +415,23 @@ def showOnlyPhysical(
         representation at $\Gamma$ and zero frequency.
     """
     rv = np.delete(v, range(N_gamma))  # type: ignore
-    rEBR = np.delete(EBRs, range(N_gamma), axis=0)  # type: ignore
+    rEBR = np.delete(ebr_irreps, range(N_gamma), axis=0)  # type: ignore
 
-    long_modes = searchForAllLongModes(dim, t).solutions()
+    long_modes = search_for_all_long_modes(dim, t).solutions()
 
-    all_EBRs = searchForAll_EBRs(rv, dim, rEBR, long_modes)
+    all_EBRs = search_for_all_ebrs(rv, dim, rEBR, long_modes)
 
     TETB_vs_LM = [
-        [(all_EBRs[i] @ ebrs).tolist(), (long_modes[i] @ ebrs)]
+        [(all_EBRs[i] @ ebr_names).tolist(), (long_modes[i] @ ebr_names)]
         for i in range(len(long_modes))
         if all_EBRs[i].shape[0] > 0
     ]
 
     physical = [
         [
-            phys(TETB_vs_LM[i][0][j], v, ebrs, EBRs, SG, irreps)
+            ebr_sum_is_physical(
+                TETB_vs_LM[i][0][j], v, ebr_names, ebr_irreps, sg, irreps
+            )
             for j in range(len(TETB_vs_LM[i][0]))
         ]
         for i in range(len(TETB_vs_LM))
@@ -422,8 +442,8 @@ def showOnlyPhysical(
             (
                 irreps
                 @ (
-                    ebr2irvec(TETB_vs_LM[i][0][j], ebrs, EBRs)
-                    - ebr2irvec(TETB_vs_LM[i][1], ebrs, EBRs)
+                    ebr2irvec(TETB_vs_LM[i][0][j], ebr_names, ebr_irreps)
+                    - ebr2irvec(TETB_vs_LM[i][1], ebr_names, ebr_irreps)
                     - v
                 )
             )
