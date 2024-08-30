@@ -17,7 +17,7 @@ setuptools.setup(
     ],  # Name of the python package
     package_dir={"": "src"},  # Directory of the source code of the package
     install_requires=[
-        "numpy==2.0.0",
+        "numpy",
         "sympy==1.12",
         "ortools==9.10.4067",
     ],  # Install other dependencies if any
