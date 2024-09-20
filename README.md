@@ -18,7 +18,7 @@ pip install .
 
 It requieres three additional packages:
 
-1. [NumPy](https://github.com/numpy/numpy.git) (v2.0.0)
+1. [NumPy](https://github.com/numpy/numpy.git)
 2. [SymPy](https://github.com/sympy/sympy.git) (v1.12)
 3. [OR-Tools - Google Optimization Tools](https://github.com/google/or-tools.git) (v9.10.4067)
 
